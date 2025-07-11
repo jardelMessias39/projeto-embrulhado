@@ -17,6 +17,8 @@
       <option value="4x3">4x3</option>
       <option value="4x4">4x4</option>
       <option value="4x5">4x5</option>
+      <button id="reiniciar-jogo" style="margin-top: 10px;">Reiniciar Jogo</button>
+
     </select>
     <label for="imagem-selecao">Imagem:</label>
     <select id="imagem-selecao">
@@ -109,6 +111,7 @@
     });
 
     btnIniciar.addEventListener('click', function () {
+        
       jogoEncerrado = false;
       quebraCabeca.innerHTML = '';
       primeiraSelecionada = null;
@@ -121,6 +124,16 @@
           atualizarCronometro();
         }
       }, 1000);
+      const btnReiniciar = document.getElementById('reiniciar-jogo');
+      btnReiniciar.addEventListener('click', () => {
+  if (!jogoEncerrado) {
+    clearInterval(intervaloCronometro);
+    musicaFrequencia.pause();
+    musicaFrequencia.currentTime = 0;
+  }
+  btnIniciar.click(); // reaproveita toda a lógica de iniciar o jogo
+});
+
 
       musicaFrequencia.pause();
       musicaFrequencia.currentTime = 0;

@@ -1,22 +1,25 @@
+<!-- O conteúdo completo do HTML atualizado está logo abaixo -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="./imagem/assets/Copilot_20250711_024116.ico">
   <title>shuffle image</title>
 </head>
 <body>
-    <h2>shuffle </h2>
+  <h2>shuffle</h2>
   <div class="caixa-imagem">
     <label for="divisao-imagem">Divisão:</label>
-    <select id="divisao-imagem" class="divisao-imagem">
+    <select id="divisao-imagem">
       <option value="4x2">4x2</option>
       <option value="4x3">4x3</option>
       <option value="4x4">4x4</option>
       <option value="4x5">4x5</option>
     </select>
     <label for="imagem-selecao">Imagem:</label>
-    <select id="imagem-selecao" class="imagem-selecao">
+    <select id="imagem-selecao">
       <option value="Brasil.jpg">Brasil</option>
       <option value="coelho.jpg">Coelho</option>
       <option value="indiana.jpg">Indiana</option>
@@ -25,18 +28,22 @@
       <option value="praia-do-forte.jpg">Praia do Forte</option>
       <option value="tropical.jpg">Tropical</option>
     </select>
-    <img id="imagem-principal" src="./imagem/Brasil.jpg" alt="imagem principal do quebra-cabeça"
-      style="max-width: 400px; display: block; margin-top: 10px;" />
+    <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;" />
     <button id="iniciar-jogo" style="margin-top: 10px;">Iniciar Jogo</button>
-    <div id="quebra-cabeca"
-      style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;">
-    </div>
+    <div id="quebra-cabeca" style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;"></div>
     <div id="cronometro" style="font-size: 20px; margin-top: 10px;">Tempo: 00:00</div>
   </div>
-
   <audio id="musica-frequencia" loop></audio>
 
   <script>
+    const selectImagem = document.getElementById('imagem-selecao');
+    const imgPrincipal = document.getElementById('imagem-principal');
+    const selectDivisao = document.getElementById('divisao-imagem');
+    const btnIniciar = document.getElementById('iniciar-jogo');
+    const quebraCabeca = document.getElementById('quebra-cabeca');
+    const cronometroDisplay = document.getElementById('cronometro');
+    const musicaFrequencia = document.getElementById('musica-frequencia');
+
     const faixasAudio = [
       './musicas/blue-sky-binaural-meditation-191542.mp3',
       './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
@@ -47,19 +54,11 @@
       './musicas/binaural-beats-6hz-mind-flow-from-album-quottheta-patternsquot-196990.mp3'
     ];
 
-    const selectImagem = document.getElementById('imagem-selecao');
-    const imgPrincipal = document.getElementById('imagem-principal');
-    const selectDivisao = document.getElementById('divisao-imagem');
-    const btnIniciar = document.getElementById('iniciar-jogo');
-    const quebraCabeca = document.getElementById('quebra-cabeca');
-    const cronometroDisplay = document.getElementById('cronometro');
-    const musicaFrequencia = document.getElementById('musica-frequencia');
-
     let tempo = 0;
     let intervaloCronometro = null;
     let primeiraSelecionada = null;
     let pecaArrastando = null;
-    let jogoEncerrado = false; // Flag para controlar se o jogo acabou
+    let jogoEncerrado = false;
 
     function atualizarCronometro() {
       const minutos = Math.floor(tempo / 60);
@@ -78,19 +77,31 @@
         const posCorreta = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
         if (pecasAtuais[i].style.backgroundPosition !== posCorreta) return false;
       }
-
       return true;
     }
 
     function encerrarJogo() {
-      if (jogoEncerrado) return; // Só encerra uma vez!
+      if (jogoEncerrado) return;
       jogoEncerrado = true;
       clearInterval(intervaloCronometro);
       musicaFrequencia.pause();
       musicaFrequencia.currentTime = 0;
-      setTimeout(() => { // Pequeno delay para evitar alert duplo em drag e click
-        alert(`Parabéns! Você completou o quebra-cabeça em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
-      }, 100);
+      setTimeout(() => {
+        alert(`✅ Concluído! Parabéns 🎉 Você terminou em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
+      }, 150);
+    }
+
+    function saoVizinhos(p1, p2) {
+      const pecas = Array.from(quebraCabeca.children);
+      const index1 = pecas.indexOf(p1);
+      const index2 = pecas.indexOf(p2);
+      const colunas = parseInt(selectDivisao.value.split('x')[0]);
+
+      const diff = Math.abs(index1 - index2);
+      return (
+        diff === 1 && Math.floor(index1 / colunas) === Math.floor(index2 / colunas)
+        || diff === colunas
+      );
     }
 
     selectImagem.addEventListener('change', function () {
@@ -98,7 +109,7 @@
     });
 
     btnIniciar.addEventListener('click', function () {
-      jogoEncerrado = false; // Ao iniciar novo jogo, libera tudo
+      jogoEncerrado = false;
       quebraCabeca.innerHTML = '';
       primeiraSelecionada = null;
       tempo = 0;
@@ -142,25 +153,28 @@
           pecas.push(peca);
         }
       }
+
       pecas.sort(() => Math.random() - 0.5);
       pecas.forEach(peca => quebraCabeca.appendChild(peca));
     });
 
     quebraCabeca.addEventListener('click', function (e) {
-      if (jogoEncerrado) return; // Impede ação após encerrar
-      if (e.target === quebraCabeca) return;
+      if (jogoEncerrado || e.target === quebraCabeca) return;
       if (!primeiraSelecionada) {
         primeiraSelecionada = e.target;
         e.target.style.outline = '2px solid red';
-      } else if (e.target !== primeiraSelecionada) {
+      } else if (e.target !== primeiraSelecionada && saoVizinhos(primeiraSelecionada, e.target)) {
         const temp = document.createElement('div');
-        quebraCabeca.replaceChild(temp, primeiraSelecionada);
-        quebraCabeca.replaceChild(primeiraSelecionada, e.target);
+         quebraCabeca.replaceChild(primeiraSelecionada, e.target);
         quebraCabeca.replaceChild(e.target, temp);
         primeiraSelecionada.style.outline = '';
         primeiraSelecionada = null;
 
         if (verificarVitoria()) encerrarJogo();
+      } else {
+        // Se não forem vizinhos, cancela seleção
+        primeiraSelecionada.style.outline = '';
+        primeiraSelecionada = null;
       }
     });
 
@@ -177,7 +191,7 @@
     function drop(e) {
       e.preventDefault();
       if (jogoEncerrado) return;
-      if (pecaArrastando && pecaArrastando !== this) {
+      if (pecaArrastando && pecaArrastando !== this && saoVizinhos(pecaArrastando, this)) {
         const temp = document.createElement('div');
         quebraCabeca.replaceChild(temp, pecaArrastando);
         quebraCabeca.replaceChild(pecaArrastando, this);

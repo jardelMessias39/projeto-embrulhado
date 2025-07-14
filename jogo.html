@@ -17,7 +17,7 @@
       <option value="4x3">4x3</option>
       <option value="4x4">4x4</option>
       <option value="4x5">4x5</option>
-      <button id="reiniciar-jogo" style="margin-top: 10px;">Reiniciar Jogo</button>
+      
 
     </select>
     <label for="imagem-selecao">Imagem:</label>
@@ -32,12 +32,14 @@
     </select>
     <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;" />
     <button id="iniciar-jogo" style="margin-top: 10px;">Iniciar Jogo</button>
+    <button id="reiniciar-jogo" style="margin-top: 10px;">Reiniciar Jogo</button>
     <div id="quebra-cabeca" style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;"></div>
     <div id="cronometro" style="font-size: 20px; margin-top: 10px;">Tempo: 00:00</div>
   </div>
   <audio id="musica-frequencia" loop></audio>
 
   <script>
+    
     const selectImagem = document.getElementById('imagem-selecao');
     const imgPrincipal = document.getElementById('imagem-principal');
     const selectDivisao = document.getElementById('divisao-imagem');

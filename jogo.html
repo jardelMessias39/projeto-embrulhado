@@ -39,187 +39,159 @@
   <audio id="musica-frequencia" loop></audio>
 
   <script>
-    
-    const selectImagem = document.getElementById('imagem-selecao');
-    const imgPrincipal = document.getElementById('imagem-principal');
-    const selectDivisao = document.getElementById('divisao-imagem');
-    const btnIniciar = document.getElementById('iniciar-jogo');
-    const quebraCabeca = document.getElementById('quebra-cabeca');
-    const cronometroDisplay = document.getElementById('cronometro');
-    const musicaFrequencia = document.getElementById('musica-frequencia');
+  const selectImagem = document.getElementById('imagem-selecao');
+  const imgPrincipal = document.getElementById('imagem-principal');
+  const selectDivisao = document.getElementById('divisao-imagem');
+  const btnIniciar = document.getElementById('iniciar-jogo');
+  const btnReiniciar = document.getElementById('reiniciar-jogo');
+  const quebraCabeca = document.getElementById('quebra-cabeca');
+  const cronometroDisplay = document.getElementById('cronometro');
+  const musicaFrequencia = document.getElementById('musica-frequencia');
 
-    const faixasAudio = [
-      './musicas/blue-sky-binaural-meditation-191542.mp3',
-      './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
-      './musicas/kugelsicher-by-tremoxbeatz-302838.mp3',
-      './musicas/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3',
-      './musicas/royalty-free-splint-hard-808-rap-beat-quotflutequot-223009.mp3',
-      './musicas/summer-time-type-beat-hard-trap-x-rap-type-beat-372330.mp3',
-      './musicas/binaural-beats-6hz-mind-flow-from-album-quottheta-patternsquot-196990.mp3'
-    ];
+  const faixasAudio = [
+    './musicas/blue-sky-binaural-meditation-191542.mp3',
+    './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
+    './musicas/kugelsicher-by-tremoxbeatz-302838.mp3',
+    './musicas/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3',
+    './musicas/royalty-free-splint-hard-808-rap-beat-quotflutequot-223009.mp3',
+    './musicas/summer-time-type-beat-hard-trap-x-rap-type-beat-372330.mp3',
+    './musicas/binaural-beats-6hz-mind-flow-from-album-quottheta-patternsquot-196990.mp3'
+  ];
 
-    let tempo = 0;
-    let intervaloCronometro = null;
-    let primeiraSelecionada = null;
-    let pecaArrastando = null;
-    let jogoEncerrado = false;
+  let tempo = 0;
+  let intervaloCronometro = null;
+  let pecaArrastando = null;
+  let jogoEncerrado = false;
 
-    function atualizarCronometro() {
-      const minutos = Math.floor(tempo / 60);
-      const segundos = tempo % 60;
-      cronometroDisplay.textContent = `Tempo: ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  function atualizarCronometro() {
+    const minutos = Math.floor(tempo / 60);
+    const segundos = tempo % 60;
+    cronometroDisplay.textContent = `Tempo: ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  }
+
+  function verificarVitoria() {
+    const pecasAtuais = Array.from(quebraCabeca.children);
+    const colunas = parseInt(selectDivisao.value.split('x')[0]);
+    for (let i = 0; i < pecasAtuais.length; i++) {
+      const l = Math.floor(i / colunas);
+      const c = i % colunas;
+      const posCorreta = `${l}-${c}`;
+      if (pecasAtuais[i].dataset.pos !== posCorreta) return false;
     }
+    return true;
+  }
 
-    function verificarVitoria() {
-      const pecasAtuais = Array.from(quebraCabeca.children);
-      const colunas = parseInt(selectDivisao.value.split('x')[0]);
-      const linhas = parseInt(selectDivisao.value.split('x')[1]);
-
-      for (let i = 0; i < pecasAtuais.length; i++) {
-        const l = Math.floor(i / colunas);
-        const c = i % colunas;
-        const posCorreta = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
-        if (pecasAtuais[i].style.backgroundPosition !== posCorreta) return false;
-      }
-      return true;
-    }
-
-    function encerrarJogo() {
-      if (jogoEncerrado) return;
-      jogoEncerrado = true;
-      clearInterval(intervaloCronometro);
-      musicaFrequencia.pause();
-      musicaFrequencia.currentTime = 0;
-      setTimeout(() => {
-        alert(`✅ Concluído! Parabéns 🎉 Você terminou em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
-      }, 150);
-    }
-
-    function saoVizinhos(p1, p2) {
-      const pecas = Array.from(quebraCabeca.children);
-      const index1 = pecas.indexOf(p1);
-      const index2 = pecas.indexOf(p2);
-      const colunas = parseInt(selectDivisao.value.split('x')[0]);
-
-      const diff = Math.abs(index1 - index2);
-      return (
-        diff === 1 && Math.floor(index1 / colunas) === Math.floor(index2 / colunas)
-        || diff === colunas
-      );
-    }
-
-    selectImagem.addEventListener('change', function () {
-      imgPrincipal.src = './imagem/' + this.value;
-    });
-
-    btnIniciar.addEventListener('click', function () {
-        
-      jogoEncerrado = false;
-      quebraCabeca.innerHTML = '';
-      primeiraSelecionada = null;
-      tempo = 0;
-      atualizarCronometro();
-      clearInterval(intervaloCronometro);
-      intervaloCronometro = setInterval(() => {
-        if (!jogoEncerrado) {
-          tempo++;
-          atualizarCronometro();
-        }
-      }, 1000);
-      const btnReiniciar = document.getElementById('reiniciar-jogo');
-      btnReiniciar.addEventListener('click', () => {
-  if (!jogoEncerrado) {
+  function encerrarJogo() {
+    if (jogoEncerrado) return;
+    jogoEncerrado = true;
     clearInterval(intervaloCronometro);
     musicaFrequencia.pause();
     musicaFrequencia.currentTime = 0;
+    setTimeout(() => {
+      alert(`✅ Concluído! Parabéns 🎉 Você terminou em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
+    }, 150);
   }
-  btnIniciar.click(); // reaproveita toda a lógica de iniciar o jogo
-});
 
+  function saoVizinhos(p1, p2) {
+    const pecas = Array.from(quebraCabeca.children);
+    const index1 = pecas.indexOf(p1);
+    const index2 = pecas.indexOf(p2);
+    const colunas = parseInt(selectDivisao.value.split('x')[0]);
+    const diff = Math.abs(index1 - index2);
+    return (
+      diff === 1 && Math.floor(index1 / colunas) === Math.floor(index2 / colunas)
+      || diff === colunas
+    );
+  }
 
+  selectImagem.addEventListener('change', function () {
+    imgPrincipal.src = './imagem/' + this.value;
+  });
+
+  btnIniciar.addEventListener('click', function () {
+    jogoEncerrado = false;
+    quebraCabeca.innerHTML = '';
+    tempo = 0;
+    atualizarCronometro();
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = setInterval(() => {
+      if (!jogoEncerrado) {
+        tempo++;
+        atualizarCronometro();
+      }
+    }, 1000);
+
+    musicaFrequencia.pause();
+    musicaFrequencia.currentTime = 0;
+    const faixaAleatoria = faixasAudio[Math.floor(Math.random() * faixasAudio.length)];
+    musicaFrequencia.src = faixaAleatoria;
+    musicaFrequencia.volume = 0.3;
+    musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
+
+    const divisao = selectDivisao.value.split('x');
+    const colunas = parseInt(divisao[0]);
+    const linhas = parseInt(divisao[1]);
+    let pecas = [];
+
+    for (let l = 0; l < linhas; l++) {
+      for (let c = 0; c < colunas; c++) {
+        const peca = document.createElement('div');
+        peca.style.width = (400 / colunas) + 'px';
+        peca.style.height = (300 / linhas) + 'px';
+        peca.style.backgroundImage = `url('${imgPrincipal.src}')`;
+        peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+        peca.style.backgroundPosition = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
+        peca.style.border = '1px solid #eee';
+        peca.style.boxSizing = 'border-box';
+        peca.dataset.pos = `${l}-${c}`;
+        peca.draggable = true;
+        peca.addEventListener('dragstart', dragStart);
+        peca.addEventListener('dragover', dragOver);
+        peca.addEventListener('drop', drop);
+        peca.addEventListener('dragend', dragEnd);
+        pecas.push(peca);
+      }
+    }
+
+    pecas.sort(() => Math.random() - 0.5);
+    pecas.forEach(peca => quebraCabeca.appendChild(peca));
+  });
+
+  // Evento do botão Reiniciar (apenas uma vez)
+  btnReiniciar.addEventListener('click', () => {
+    if (!jogoEncerrado) {
+      clearInterval(intervaloCronometro);
       musicaFrequencia.pause();
       musicaFrequencia.currentTime = 0;
-      const faixaAleatoria = faixasAudio[Math.floor(Math.random() * faixasAudio.length)];
-      musicaFrequencia.src = faixaAleatoria;
-      musicaFrequencia.volume = 0.3;
-      musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
-
-      const divisao = selectDivisao.value.split('x');
-      const colunas = parseInt(divisao[0]);
-      const linhas = parseInt(divisao[1]);
-      let pecas = [];
-
-      for (let l = 0; l < linhas; l++) {
-        for (let c = 0; c < colunas; c++) {
-          const peca = document.createElement('div');
-          peca.style.width = (400 / colunas) + 'px';
-          peca.style.height = (300 / linhas) + 'px';
-          peca.style.backgroundImage = `url('${imgPrincipal.src}')`;
-          peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
-          peca.style.backgroundPosition = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
-          peca.style.border = '1px solid #eee';
-          peca.style.boxSizing = 'border-box';
-          peca.dataset.pos = `${l}-${c}`;
-          peca.draggable = true;
-          peca.addEventListener('dragstart', dragStart);
-          peca.addEventListener('dragover', dragOver);
-          peca.addEventListener('drop', drop);
-          peca.addEventListener('dragend', dragEnd);
-          pecas.push(peca);
-        }
-      }
-
-      pecas.sort(() => Math.random() - 0.5);
-      pecas.forEach(peca => quebraCabeca.appendChild(peca));
-    });
-
-    quebraCabeca.addEventListener('click', function (e) {
-      if (jogoEncerrado || e.target === quebraCabeca) return;
-      if (!primeiraSelecionada) {
-        primeiraSelecionada = e.target;
-        e.target.style.outline = '2px solid red';
-      } else if (e.target !== primeiraSelecionada && saoVizinhos(primeiraSelecionada, e.target)) {
-        const temp = document.createElement('div');
-         quebraCabeca.replaceChild(primeiraSelecionada, e.target);
-        quebraCabeca.replaceChild(e.target, temp);
-        primeiraSelecionada.style.outline = '';
-        primeiraSelecionada = null;
-
-        if (verificarVitoria()) encerrarJogo();
-      } else {
-        // Se não forem vizinhos, cancela seleção
-        primeiraSelecionada.style.outline = '';
-        primeiraSelecionada = null;
-      }
-    });
-
-    function dragStart(e) {
-      if (jogoEncerrado) return;
-      pecaArrastando = this;
-      setTimeout(() => this.style.opacity = '0.5', 0);
     }
+    btnIniciar.click();
+  });
 
-    function dragOver(e) {
-      e.preventDefault();
+  function dragStart(e) {
+    if (jogoEncerrado) return;
+    pecaArrastando = this;
+    setTimeout(() => this.style.opacity = '0.5', 0);
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+  }
+
+  function drop(e) {
+    e.preventDefault();
+    if (jogoEncerrado) return;
+    if (pecaArrastando && pecaArrastando !== this && saoVizinhos(pecaArrastando, this)) {
+      const temp = document.createElement('div');
+      quebraCabeca.replaceChild(temp, pecaArrastando);
+      quebraCabeca.replaceChild(pecaArrastando, this);
+      quebraCabeca.replaceChild(this, temp);
+
+      if (verificarVitoria()) encerrarJogo();
     }
+  }
 
-    function drop(e) {
-      e.preventDefault();
-      if (jogoEncerrado) return;
-      if (pecaArrastando && pecaArrastando !== this && saoVizinhos(pecaArrastando, this)) {
-        const temp = document.createElement('div');
-        quebraCabeca.replaceChild(temp, pecaArrastando);
-        quebraCabeca.replaceChild(pecaArrastando, this);
-        quebraCabeca.replaceChild(this, temp);
-
-        if (verificarVitoria()) encerrarJogo();
-      }
-    }
-
-    function dragEnd(e) {
-      this.style.opacity = '';
-      pecaArrastando = null;
-    }
-  </script>
-</body>
-</html>
+  function dragEnd(e) {
+    this.style.opacity = '';
+    pecaArrastando = null;
+  }
+</script>

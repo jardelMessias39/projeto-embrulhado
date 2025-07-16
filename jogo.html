@@ -1,6 +1,7 @@
 <!-- O conteúdo completo do HTML atualizado está logo abaixo -->
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,24 @@
   <link rel="icon" href="./imagem/assets/Copilot_20250711_024116.ico">
   <title>shuffle </title>
 </head>
+
 <body>
-  <h2>shuffle</h2>
+  <h2>Shuffle</h2>
+  <div id="tela-inicial"
+    style="position: absolute; top:0; left:0; width:100vw; height:100vh; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 10;">
+    <button id="botao-iniciar-jogo"
+      style="background-color: #664f8b; border: none; border-radius: 60%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #0003; cursor: pointer;">
+      <img src="imagem/assets/Copilot_20250711_024116.ico" alt="Iniciar" style="width: 150px; height: 150px;">
+    </button>
+  </div>
   <div class="caixa-imagem">
+    <!-- ...restante do seu jogo... -->
     <label for="divisao-imagem">Divisão:</label>
     <select id="divisao-imagem">
-      <option value="4x2">4x2</option>
-      <option value="4x3">4x3</option>
-      <option value="4x4">4x4</option>
-      <option value="4x5">4x5</option>
-      
+      <option value="4x2">4 x 2</option>
+      <option value="4x3">4 x 3</option>
+      <option value="4x4">4 x 4</option>
+      <option value="4x5">4 x 5</option>
 
     </select>
     <label for="imagem-selecao">Imagem:</label>
@@ -31,168 +40,196 @@
       <option value="tropical.jpg">Tropical</option>
     </select>
     <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;" />
-    <button id="iniciar-jogo" style="margin-top: 10px;">Iniciar Jogo</button>
-    <button id="reiniciar-jogo" style="margin-top: 10px;">Reiniciar Jogo</button>
-    <div id="quebra-cabeca" style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;"></div>
+    <div class="botoes-jogo">
+      <button id="iniciar-jogo">Iniciar Jogo</button>
+      <button id="reiniciar-jogo">Reiniciar Jogo</button>
+    </div>
+    <div id="quebra-cabeca"
+      style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;">
+    </div>
     <div id="cronometro" style="font-size: 20px; margin-top: 10px;">Tempo: 00:00</div>
   </div>
   <audio id="musica-frequencia" loop></audio>
 
   <script>
-  const selectImagem = document.getElementById('imagem-selecao');
-  const imgPrincipal = document.getElementById('imagem-principal');
-  const selectDivisao = document.getElementById('divisao-imagem');
-  const btnIniciar = document.getElementById('iniciar-jogo');
-  const btnReiniciar = document.getElementById('reiniciar-jogo');
-  const quebraCabeca = document.getElementById('quebra-cabeca');
-  const cronometroDisplay = document.getElementById('cronometro');
-  const musicaFrequencia = document.getElementById('musica-frequencia');
+    const telaInicial = document.getElementById('tela-inicial');
+    const botaoIniciarJogo = document.getElementById('botao-iniciar-jogo');
+    const btnIniciar = document.getElementById('iniciar-jogo');
 
-  const faixasAudio = [
-    './musicas/blue-sky-binaural-meditation-191542.mp3',
-    './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
-    './musicas/kugelsicher-by-tremoxbeatz-302838.mp3',
-    './musicas/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3',
-    './musicas/royalty-free-splint-hard-808-rap-beat-quotflutequot-223009.mp3',
-    './musicas/summer-time-type-beat-hard-trap-x-rap-type-beat-372330.mp3',
-    './musicas/binaural-beats-6hz-mind-flow-from-album-quottheta-patternsquot-196990.mp3'
-  ];
+    if (botaoIniciarJogo) {
+      botaoIniciarJogo.addEventListener('click', function () {
+        telaInicial.style.display = 'none';
 
-  let tempo = 0;
-  let intervaloCronometro = null;
-  let pecaArrastando = null;
-  let jogoEncerrado = false;
-
-  function atualizarCronometro() {
-    const minutos = Math.floor(tempo / 60);
-    const segundos = tempo % 60;
-    cronometroDisplay.textContent = `Tempo: ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-  }
-// reconhecimento da vitoria
-
-  function verificarVitoria() {
-    const pecasAtuais = Array.from(quebraCabeca.children);
-    const colunas = parseInt(selectDivisao.value.split('x')[0]);
-    for (let i = 0; i < pecasAtuais.length; i++) {
-      const l = Math.floor(i / colunas);
-      const c = i % colunas;
-      const posCorreta = `${l}-${c}`;
-      if (pecasAtuais[i].dataset.pos !== posCorreta) return false;
-    }
-    return true;
-  }
-
-  function encerrarJogo() {
-    if (jogoEncerrado) return;
-    jogoEncerrado = true;
-    clearInterval(intervaloCronometro);
-    musicaFrequencia.pause();
-    musicaFrequencia.currentTime = 0;
-    setTimeout(() => {
-      alert(`✅ Concluído! Parabéns 🎉 Você terminou em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
-    }, 150);
-  }
-
-  function saoVizinhos(p1, p2) {
-    const pecas = Array.from(quebraCabeca.children);
-    const index1 = pecas.indexOf(p1);
-    const index2 = pecas.indexOf(p2);
-    const colunas = parseInt(selectDivisao.value.split('x')[0]);
-    const diff = Math.abs(index1 - index2);
-    return (
-      diff === 1 && Math.floor(index1 / colunas) === Math.floor(index2 / colunas)
-      || diff === colunas
-    );
-  }
-
-  selectImagem.addEventListener('change', function () {
-    imgPrincipal.src = './imagem/' + this.value;
-  });
-
-  btnIniciar.addEventListener('click', function () {
-    jogoEncerrado = false;
-    quebraCabeca.innerHTML = '';
-    tempo = 0;
-    atualizarCronometro();
-    clearInterval(intervaloCronometro);
-    intervaloCronometro = setInterval(() => {
-      if (!jogoEncerrado) {
-        tempo++;
-        atualizarCronometro();
-      }
-    }, 1000);
-
-    musicaFrequencia.pause();
-    musicaFrequencia.currentTime = 0;
-    const faixaAleatoria = faixasAudio[Math.floor(Math.random() * faixasAudio.length)];
-    musicaFrequencia.src = faixaAleatoria;
-    musicaFrequencia.volume = 0.3;
-    musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
-
-    const divisao = selectDivisao.value.split('x');
-    const colunas = parseInt(divisao[0]);
-    const linhas = parseInt(divisao[1]);
-    let pecas = [];
-
-    for (let l = 0; l < linhas; l++) {
-      for (let c = 0; c < colunas; c++) {
-        const peca = document.createElement('div');
-        peca.style.width = (400 / colunas) + 'px';
-        peca.style.height = (300 / linhas) + 'px';
-        peca.style.backgroundImage = `url('${imgPrincipal.src}')`;
-        peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
-        peca.style.backgroundPosition = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
-        peca.style.border = '1px solid #eee';
-        peca.style.boxSizing = 'border-box';
-        peca.dataset.pos = `${l}-${c}`;
-        peca.draggable = true;
-        peca.addEventListener('dragstart', dragStart);
-        peca.addEventListener('dragover', dragOver);
-        peca.addEventListener('drop', drop);
-        peca.addEventListener('dragend', dragEnd);
-        pecas.push(peca);
-      }
+      });
     }
 
-    pecas.sort(() => Math.random() - 0.5);
-    pecas.forEach(peca => quebraCabeca.appendChild(peca));
-  });
+    // Evento do botão Iniciar Jogo
 
-  // Evento do botão Reiniciar (apenas uma vez)
-  btnReiniciar.addEventListener('click', () => {
-    if (!jogoEncerrado) {
+
+    const selectImagem = document.getElementById('imagem-selecao');
+    const imgPrincipal = document.getElementById('imagem-principal');
+    const selectDivisao = document.getElementById('divisao-imagem');
+
+    const btnReiniciar = document.getElementById('reiniciar-jogo');
+    const quebraCabeca = document.getElementById('quebra-cabeca');
+    const cronometroDisplay = document.getElementById('cronometro');
+    const musicaFrequencia = document.getElementById('musica-frequencia');
+
+    const faixasAudio = [
+      './musicas/blue-sky-binaural-meditation-191542.mp3',
+      './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
+      './musicas/kugelsicher-by-tremoxbeatz-302838.mp3',
+      './musicas/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3',
+      './musicas/royalty-free-splint-hard-808-rap-beat-quotflutequot-223009.mp3',
+      './musicas/summer-time-type-beat-hard-trap-x-rap-type-beat-372330.mp3',
+      './musicas/binaural-beats-6hz-mind-flow-from-album-quottheta-patternsquot-196990.mp3'
+    ];
+
+    let tempo = 0;
+    let intervaloCronometro = null;
+    let pecaArrastando = null;
+    let jogoEncerrado = false;
+
+    function atualizarCronometro() {
+      const minutos = Math.floor(tempo / 60);
+      const segundos = tempo % 60;
+      cronometroDisplay.textContent = `Tempo: ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    }
+    // reconhecimento da vitoria
+
+    function verificarVitoria() {
+      const pecasAtuais = Array.from(quebraCabeca.children);
+      const colunas = parseInt(selectDivisao.value.split('x')[0]);
+      for (let i = 0; i < pecasAtuais.length; i++) {
+        const l = Math.floor(i / colunas);
+        const c = i % colunas;
+        const posCorreta = `${l}-${c}`;
+        if (pecasAtuais[i].dataset.pos !== posCorreta) return false;
+      }
+      return true;
+    }
+
+    function encerrarJogo() {
+      if (jogoEncerrado) return;
+      jogoEncerrado = true;
       clearInterval(intervaloCronometro);
       musicaFrequencia.pause();
       musicaFrequencia.currentTime = 0;
+      setTimeout(() => {
+        alert(`✅ Concluído! Parabéns 🎉 Você terminou em ${cronometroDisplay.textContent.replace('Tempo: ', '')}`);
+      }, 150);
     }
-    btnIniciar.click();
-  });
 
-  function dragStart(e) {
-    if (jogoEncerrado) return;
-    pecaArrastando = this;
-    setTimeout(() => this.style.opacity = '0.5', 0);
-  }
-
-  function dragOver(e) {
-    e.preventDefault();
-  }
-
-  function drop(e) {
-    e.preventDefault();
-    if (jogoEncerrado) return;
-    if (pecaArrastando && pecaArrastando !== this && saoVizinhos(pecaArrastando, this)) {
-      const temp = document.createElement('div');
-      quebraCabeca.replaceChild(temp, pecaArrastando);
-      quebraCabeca.replaceChild(pecaArrastando, this);
-      quebraCabeca.replaceChild(this, temp);
-
-      if (verificarVitoria()) encerrarJogo();
+    function saoVizinhos(p1, p2) {
+      const pecas = Array.from(quebraCabeca.children);
+      const index1 = pecas.indexOf(p1);
+      const index2 = pecas.indexOf(p2);
+      const colunas = parseInt(selectDivisao.value.split('x')[0]);
+      const diff = Math.abs(index1 - index2);
+      return (
+        diff === 1 && Math.floor(index1 / colunas) === Math.floor(index2 / colunas)
+        || diff === colunas
+      );
     }
-  }
 
-  function dragEnd(e) {
-    this.style.opacity = '';
-    pecaArrastando = null;
-  }
-</script>
+    selectImagem.addEventListener('change', function () {
+      imgPrincipal.src = './imagem/' + this.value;
+    });
+
+    btnIniciar.addEventListener('click', function () {
+      jogoEncerrado = false;
+      quebraCabeca.innerHTML = '';
+      tempo = 0;
+      atualizarCronometro();
+      clearInterval(intervaloCronometro);
+      intervaloCronometro = setInterval(() => {
+        if (!jogoEncerrado) {
+          tempo++;
+          atualizarCronometro();
+        }
+      }, 1000);
+
+      musicaFrequencia.pause();
+      musicaFrequencia.currentTime = 0;
+      const faixaAleatoria = faixasAudio[Math.floor(Math.random() * faixasAudio.length)];
+      musicaFrequencia.src = faixaAleatoria;
+      musicaFrequencia.volume = 0.3;
+      musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
+
+      const divisao = selectDivisao.value.split('x');
+      const colunas = parseInt(divisao[0]);
+      const linhas = parseInt(divisao[1]);
+      let pecas = [];
+
+      for (let l = 0; l < linhas; l++) {
+        for (let c = 0; c < colunas; c++) {
+          const peca = document.createElement('div');
+          // Cálculo padrão
+          let largura = 400 / colunas;
+          // Se for a última coluna, ajusta para fechar exatamente 400px
+          if (c === colunas - 1) {
+            largura = 400 - (Math.floor(400 / colunas) * (colunas - 1));
+          }
+
+
+          peca.style.width = largura + 'px';
+          peca.style.height = (300 / linhas) + 'px';
+          peca.style.backgroundImage = `url('${imgPrincipal.src}')`;
+          peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+          peca.style.backgroundPosition = `-${c * (400 / colunas)}px -${l * (300 / linhas)}px`;
+          peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+
+          peca.style.border = '1px solid #eee';
+          peca.style.boxSizing = 'border-box';
+          peca.dataset.pos = `${l}-${c}`;
+          peca.draggable = true;
+          peca.addEventListener('dragstart', dragStart);
+          peca.addEventListener('dragover', dragOver);
+          peca.addEventListener('drop', drop);
+          peca.addEventListener('dragend', dragEnd);
+          pecas.push(peca);
+        }
+      }
+
+      pecas.sort(() => Math.random() - 0.5);
+      pecas.forEach(peca => quebraCabeca.appendChild(peca));
+    });
+
+    // Evento do botão Reiniciar (apenas uma vez)
+    btnReiniciar.addEventListener('click', () => {
+      if (!jogoEncerrado) {
+        clearInterval(intervaloCronometro);
+        musicaFrequencia.pause();
+        musicaFrequencia.currentTime = 0;
+      }
+      btnIniciar.click();
+    });
+
+    function dragStart(e) {
+      if (jogoEncerrado) return;
+      pecaArrastando = this;
+      setTimeout(() => this.style.opacity = '0.5', 0);
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function drop(e) {
+      e.preventDefault();
+      if (jogoEncerrado) return;
+      if (pecaArrastando && pecaArrastando !== this && saoVizinhos(pecaArrastando, this)) {
+        const temp = document.createElement('div');
+        quebraCabeca.replaceChild(temp, pecaArrastando);
+        quebraCabeca.replaceChild(pecaArrastando, this);
+        quebraCabeca.replaceChild(this, temp);
+
+        if (verificarVitoria()) encerrarJogo();
+      }
+    }
+
+    function dragEnd(e) {
+      this.style.opacity = '';
+      pecaArrastando = null;
+    }
+  </script>

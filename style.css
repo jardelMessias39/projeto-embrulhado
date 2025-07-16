@@ -1,0 +1,105 @@
+
+  
+
+
+body{
+ font-family: 'Courier New', Courier, monospace;
+ background-color: #eceaea;
+ color: #333;
+}
+
+h2{
+ text-align: center;
+ color: #664f8b;
+ font-size: 2em;
+ margin-top: 20px;
+}
+.caixa-imagem{
+ display:flex; 
+ flex-direction: column;
+ align-items: center;
+ margin-top: 20px;
+ border-radius: 10px solid #ccc;
+}
+label{
+ font-size: 1.2em;
+ margin-bottom: 10px;
+ color: #9d97a5;
+}
+select{
+ width: 100px;
+ padding: 10px;
+ border-radius: 5px;
+ border: 1px solid #ccc;
+ font-size: 1em;
+}
+button{
+ background-color: #664f8b;
+ color: white;
+ padding: 10px 20px;
+ border: none;
+ border-radius: 5px;
+ font-size: 1.2em;
+ cursor: pointer;
+ margin-top: 10px;
+transition: background-color 0.3s;
+}
+
+.botoes-jogo {
+  display: flex;
+  gap: 20px; /* Espaço entre os botões */
+  justify-content: center;
+  margin-top: 10px;
+}
+#quebra-cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  width: 400px;
+  height: 300px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  overflow: hidden; /* Impede que as peças saiam da div */
+  background: #fff;
+}
+button:hover{
+ background-color: #145c66;
+}
+#quebra-cabeca .peca {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: #fff;
+  cursor: pointer;
+  user-select: none; /* Impede a seleção de texto */
+  box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+#cronometro {
+  font-size: 2em;
+  color: #4b4b46;
+  background: #a7a6a8;
+  border-radius: 8px;
+  padding: 10px 30px;
+  margin: 20px auto 0 auto;
+  text-align: center;
+  width: fit-content;
+  box-shadow: 0 2px 8px #0001;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 2px;
+}
+#cronometro span {
+  color: #664f8b;
+  font-weight: bold;
+}
+#tela-inicial {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 9, 179, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}

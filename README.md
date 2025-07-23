@@ -20,7 +20,7 @@
 </div>
 
 
-  <img src = "https://github.com/jardelMessias39/projeto-embrulhado/blob/github.statusBa/imagem/desktop%20(2).png?raw=true>
+  <img src = "https://github.com/jardelMessias39/projeto-embrulhado/blob/github.statusBa/imagem/desktop%20(2).png?raw=true">
 
 
   <img src="https://github.com/jardelMessias39/projeto-embrulhado/blob/github.statusBa/imagem/mobile.png?raw=true">

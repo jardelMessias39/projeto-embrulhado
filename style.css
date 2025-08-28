@@ -71,7 +71,7 @@ button:hover{
   font-size: 1.5em;
   color: #ffffff;
   cursor: pointer;
-  user-select: none; /* Impede a seleção de texto */
+ 
   box-sizing: border-box; /* Inclui padding e border no tamanho total */
 }
 #cronometro {
@@ -103,6 +103,55 @@ button:hover{
   justify-content: center;
   z-index: 10;
 }
+/* style.css */
+
+body {
+  font-family: sans-serif;
+  margin: 20px;
+}
+
+
+
+#botao-iniciar-jogo {
+  background-color: #664f8b;
+  border: none;
+  border-radius: 60%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px #0003;
+  cursor: pointer;
+}
+
+#botao-iniciar-jogo img {
+  width: 150px;
+  height: 150px;
+}
+
+.caixa-imagem {
+  margin-top: 20px;
+}
+
+.botoes-jogo {
+  margin-top: 10px;
+}
+
+#quebra-cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  width: 400px;
+  height: 300px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+#cronometro {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
 @media screen and (max-width: 600px) {
   body {
     font-size: 14px;

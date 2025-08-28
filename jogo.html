@@ -39,7 +39,13 @@
       <option value="praia-do-forte.jpg">Praia do Forte</option>
       <option value="tropical.jpg">Tropical</option>
     </select>
-    <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;" alt="Imagem Principal" />
+    <label>
+      <input type="checkbox" id="modo-dificil" />
+      Modo Difícil
+    </label>
+
+    <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;"
+      alt="Imagem Principal" />
     <div class="botoes-jogo">
       <button id="iniciar-jogo">Iniciar Jogo</button>
       <button id="reiniciar-jogo">Reiniciar Jogo</button>
@@ -60,8 +66,52 @@
       botaoIniciarJogo.addEventListener('click', function () {
         telaInicial.style.display = 'none';
 
-      });
-    }
+
+        const modoDificil = document.getElementById('modo-dificil').checked;
+        let pecas = [];
+
+        for (let l = 0; l < linhas; l++) {
+          for (let c = 0; c < colunas; c++) {
+            const peca = document.createElement('div');
+            const largura = 400 / colunas;
+            const altura = 300 / linhas;
+
+            peca.style.width = largura + 'px';
+            peca.style.height = altura + 'px';
+            peca.style.backgroundImage = `url('${imgPrincipal.src}')`;
+            peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+            peca.style.backgroundPosition = `-${c * largura}px -${l * altura}px`;
+            peca.style.border = '1px solid #eee';
+            peca.style.boxSizing = 'border-box';
+            peca.dataset.pos = `${l}-${c}`;
+            peca.draggable = true;
+
+            // Aplica rotação se modo difícil estiver ativado
+            if (modoDificil) {
+              const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
+              peca.style.transform = `rotate(${angulo}deg)`;
+              peca.dataset.angulo = angulo;
+            }
+
+            peca.addEventListener('dragstart', dragStart);
+            peca.addEventListener('dragover', dragOver);
+            peca.addEventListener('drop', drop);
+            peca.addEventListener('dragend', dragEnd);
+
+            pecas.push(peca);
+          }
+
+          // Agora embaralha as peças
+         embaralharArray(pecas);
+
+
+          // E só então adiciona ao quebra-cabeça
+          pecas.forEach(peca => quebraCabeca.appendChild(peca));
+
+        }
+
+     });
+   }
 
     // Evento do botão Iniciar Jogo
 
@@ -107,6 +157,8 @@
         if (pecasAtuais[i].dataset.pos !== posCorreta) return false;
       }
       return true;
+      if (modoDificil && pecasAtuais[i].dataset.angulo !== "0") return false;
+
     }
 
     function encerrarJogo() {
@@ -137,6 +189,7 @@
     });
 
     btnIniciar.addEventListener('click', function () {
+
       jogoEncerrado = false;
       quebraCabeca.innerHTML = '';
       tempo = 0;
@@ -156,10 +209,16 @@
       musicaFrequencia.volume = 0.3;
       musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
 
-      const divisao = selectDivisao.value.split('x');
-      const colunas = parseInt(divisao[0]);
-      const linhas = parseInt(divisao[1]);
-      let pecas = [];
+    const modoDificil = document.getElementById('modo-dificil').checked;
+const divisao = selectDivisao.value.split('x');
+const colunas = parseInt(divisao[0]);
+const linhas = parseInt(divisao[1]);
+const imagemSrc = imgPrincipal.src;
+
+quebraCabeca.innerHTML = '';
+const pecas = criarPecas(colunas, linhas, imagemSrc, modoDificil);
+pecas.forEach(peca => quebraCabeca.appendChild(peca));
+
 
       for (let l = 0; l < linhas; l++) {
         for (let c = 0; c < colunas; c++) {
@@ -169,7 +228,12 @@
           // Se for a última coluna, ajusta para fechar exatamente 400px
           if (c === colunas - 1) {
             largura = 400 - (Math.floor(400 / colunas) * (colunas - 1));
+          } if (modoDificil) {
+            const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
+            peca.style.transform = `rotate(${angulo}deg)`;
+            peca.dataset.angulo = angulo;
           }
+
 
 
           peca.style.width = largura + 'px';
@@ -193,7 +257,66 @@
 
       pecas.sort(() => Math.random() - 0.5);
       pecas.forEach(peca => quebraCabeca.appendChild(peca));
+
     });
+    
+    function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
+  const pecas = [];
+
+  const largura = 400 / colunas;
+  const altura = 300 / linhas;
+
+  for (let l = 0; l < linhas; l++) {
+    for (let c = 0; c < colunas; c++) {
+      const peca = document.createElement('div');
+
+      peca.style.width = `${largura}px`;
+      peca.style.height = `${altura}px`;
+      peca.style.backgroundImage = `url('${imagemSrc}')`;
+      peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+      peca.style.backgroundPosition = `-${c * largura}px -${l * altura}px`;
+
+  for (let l = 0; l < linhas; l++) {
+    for (let c = 0; c < colunas; c++) {
+      const peca = document.createElement('div');
+
+      peca.style.width = `${largura}px`;
+      peca.style.height = `${altura}px`;
+      peca.style.backgroundImage = `url('${imagemSrc}')`;
+      peca.style.backgroundSize = `${colunas * 100}% ${linhas * 100}%`;
+      peca.style.backgroundPosition = `-${c * largura}px -${l * altura}px`;
+      peca.style.border = '1px solid #eee';
+      peca.style.boxSizing = 'border-box';
+      peca.dataset.pos = `${l}-${c}`;
+      peca.draggable = true;
+
+      if (modoDificil) {
+        const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
+        peca.style.transform = `rotate(${angulo}deg)`;
+        peca.dataset.angulo = angulo;
+      }
+
+      peca.addEventListener('dragstart', dragStart);
+      peca.addEventListener('dragover', dragOver);
+      peca.addEventListener('drop', drop);
+      peca.addEventListener('dragend', dragEnd);
+
+      pecas.push(peca);
+    }
+  }
+
+  embaralharArray(pecas);
+  return pecas;
+
+}
+
+
+
+
+
+
+
+
 
     // Evento do botão Reiniciar (apenas uma vez)
     btnReiniciar.addEventListener('click', () => {
@@ -214,6 +337,13 @@
     function dragOver(e) {
       e.preventDefault();
     }
+
+function embaralharArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
     function drop(e) {
       e.preventDefault();

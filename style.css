@@ -2,203 +2,129 @@
   
 
 
-body{
- font-family: 'Courier New', Courier, monospace;
- background-color: #eceaea;
- color: #333;
-}
-
-h2{
- text-align: center;
- color: #664f8b;
- font-size: 2em;
- margin-top: 20px;
-}
-.caixa-imagem{
- display:flex; 
- flex-direction: column;
- align-items: center;
- margin-top: 20px;
- border-radius: 10px solid #ccc;
-}
-label{
- font-size: 1.2em;
- margin-bottom: 10px;
- color: #9d97a5;
-}
-select{
- width: 100px;
- padding: 10px;
- border-radius: 5px;
- border: 1px solid #ccc;
- font-size: 1em;
-}
-button{
- background-color: #664f8b;
- color: white;
- padding: 10px 20px;
- border: none;
- border-radius: 5px;
- font-size: 1.2em;
- cursor: pointer;
- margin-top: 10px;
-transition: background-color 0.3s;
-}
-
-.botoes-jogo {
-  display: flex;
-  gap: 20px; /* Espaço entre os botões */
-  justify-content: center;
-  margin-top: 10px;
-}
-#quebra-cabeca {
-  display: flex;
-  flex-wrap: wrap;
-  width: 400px;
-  height: 300px;
-  margin-top: 20px;
-  border: 1px solid #ccc;
-  overflow: hidden; /* Impede que as peças saiam da div */
-  background: #fff;
-}
-button:hover{
- background-color: #145c66;
-}
-#quebra-cabeca .peca {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5em;
-  color: #ffffff;
-  cursor: pointer;
- 
-  box-sizing: border-box; /* Inclui padding e border no tamanho total */
-}
-#cronometro {
-  font-size: 2em;
-  color: #4b4b46;
-  background: #a7a6a8;
-  border-radius: 8px;
-  padding: 10px 30px;
-  margin: 20px auto 0 auto;
-  text-align: center;
-  width: fit-content;
-  box-shadow: 0 2px 8px #0001;
-  font-family: 'Courier New', Courier, monospace;
-  letter-spacing: 2px;
-}
-#cronometro span {
-  color: #664f8b;
-  font-weight: bold;
-}
-#tela-inicial {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 9, 179, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-/* style.css */
-
 body {
-  font-family: sans-serif;
-  margin: 20px;
+  font-family: 'Poppins', sans-serif; /* Vamos usar uma fonte mais moderna */
+  background-color: #f5f5f5; /* Fundo mais suave */
+  color: #4a4a4a; /* Cinza escuro para o texto */
 }
 
-
-
-#botao-iniciar-jogo {
-  background-color: #664f8b;
-  border: none;
-  border-radius: 60%;
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 20px #0003;
-  cursor: pointer;
+#tela-inicial {
+  transition: opacity 0.5s ease;
+}
+/* Container para centralizar tudo */
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-#botao-iniciar-jogo img {
-  width: 150px;
-  height: 150px;
-}
-
+/* Modificação no .caixa-imagem para adicionar sombra e bordas arredondadas */
 .caixa-imagem {
+  display: flex; 
+  flex-direction: column;
+  align-items: center;
   margin-top: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.botoes-jogo {
+/* Ajuste no seletor */
+select {
+  width: 150px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 1em;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+button {
+  background-color: #664f8b;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2em;
+  cursor: pointer;
   margin-top: 10px;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+button:hover {
+  background-color: #8a6fbf; /* Roxo mais claro */
+  transform: translateY(-2px); /* Efeito de 'subir' ao passar o mouse */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra maior */
+}
 #quebra-cabeca {
   display: flex;
   flex-wrap: wrap;
-  width: 400px;
-  height: 300px;
-  margin-top: 20px;
-  border: 1px solid #ccc;
+  width: 90vw; /* Usa 90% da largura da tela */
+  max-width: 400px; /* Mas não deixa passar de 400px em telas grandes */
+  height: auto; /* A altura se ajusta automaticamente */
+  margin: 20px auto; /* Centraliza na tela */
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-#cronometro {
-  font-size: 20px;
-  margin-top: 10px;
+#quebra-cabeca .peca {
+  border: 1px solid rgba(255, 255, 255, 0.5); /* Borda branca transparente para as peças */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra sutil nas peças */
 }
-
-@media screen and (max-width: 600px) {
-  body {
-    font-size: 14px;
+/* Estilos para o jogo em telas de até 768px (tablets em modo retrato) */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+    padding: 10px;
+    border-radius: 10px;
   }
+  
   h2 {
     font-size: 1.5em;
   }
-  select {
-    width: 80px;
+
+  .botoes-jogo {
+    flex-direction: column; /* Botões ficam um em cima do outro */
+    gap: 10px;
   }
+
   button {
-    padding: 8px 16px;
+    width: 80%; /* Botões ocupam mais espaço */
+    margin: 0 auto; /* Centraliza os botões */
+    padding: 10px 20px;
     font-size: 1em;
   }
-  #quebra-cabeca {
+
+  #cronometro {
+    font-size: 1.5em;
+    padding: 8px 20px;
+  }
+}
+
+/* Estilos para o jogo em telas de até 480px (celulares) */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  h2 {
+    font-size: 1.2em;
+  }
+
+  select {
     width: 100%;
-    height: auto;
-    flex-direction: column;
+    margin-bottom: 10px;
   }
-  #tela-inicial {
-    flex-direction: column;
-    padding: 20px;
+
+  #quebra-cabeca {
+    width: 95vw;
   }
-  @media screen and (max-width: 400px) {
-    body {
-      font-size: 12px;
-    }
-    h2 {
-      font-size: 1.2em;
-    }
-    select {
-      width: 60px;
-    }
-    button {
-      padding: 6px 12px;
-      font-size: 0.9em;
-    }
-    #quebra-cabeca {
-      width: 100%;
-      height: auto;
-      flex-direction: column;
-    }
-    
-  }
-  #tela-inicial {
-    flex-direction: column;
-    padding: 20px;
-  }
-  
 }

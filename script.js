@@ -54,7 +54,6 @@ function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
             peca.style.boxSizing = 'border-box';
             peca.dataset.pos = `${l}-${c}`;
             peca.draggable = true;
-            peca.classList.add('peca-jogo');
 
             if (modoDificil) {
                 const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
@@ -222,42 +221,6 @@ function drop(e) {
         if (verificarVitoria()) encerrarJogo();
     }
 }
-peca.addEventListener('touchstart', touchStart);
-peca.addEventListener('touchend', touchEnd);
-
-let pecaToqueInicial = null;
-
-function touchStart(e) {
-  if (jogoEncerrado) return;
-  pecaToqueInicial = e.currentTarget;
-  pecaToqueInicial.style.opacity = '0.5';
-}
-
-function touchEnd(e) {
-  if (jogoEncerrado || !pecaToqueInicial) return;
-
-  const toqueFinal = document.elementFromPoint(
-    e.changedTouches[0].clientX,
-    e.changedTouches[0].clientY
-  );
-
-  if (
-    toqueFinal &&
-    toqueFinal.classList.contains('peca-jogo') &&
-    toqueFinal !== pecaToqueInicial &&
-    saoVizinhos(pecaToqueInicial, toqueFinal)
-  ) {
-    const temp = document.createElement('div');
-    quebraCabeca.replaceChild(temp, pecaToqueInicial);
-    quebraCabeca.replaceChild(pecaToqueInicial, toqueFinal);
-    quebraCabeca.replaceChild(toqueFinal, temp);
-
-    if (verificarVitoria()) encerrarJogo();
-  }
-
-  pecaToqueInicial.style.opacity = '';
-  pecaToqueInicial = null;
-}
 
 function dragEnd(e) {
     this.style.opacity = '';
@@ -270,40 +233,28 @@ function dragEnd(e) {
 
 // O botão "Iniciar Jogo" na tela inicial
 // Ele esconde a tela inicial e, em seguida, inicia o jogo.
-
-// 1. LISTENER PARA A TELA INICIAL (Faz a transição)
-telaInicial.addEventListener('click', () => { 
+botaoIniciarJogo.addEventListener('click', () => {
     if (estadoDoJogo === "inicio") {
         telaInicial.style.opacity = '0';
         setTimeout(() => {
             telaInicial.style.display = 'none';
-            estadoDoJogo = "pronto"; // Prepara para receber o clique no botão 'Iniciar Jogo'
+            estadoDoJogo = "pronto"; // agora o botão serve para iniciar o jogo
         }, 500);
-    } 
-    // FIM da função do clique na tela inicial. Ela não tem mais código aqui.
+    } else if (estadoDoJogo === "pronto") {
+        const imagemSelecionada = selectImagem.value;
+        const divisaoSelecionada = selectDivisao.value;
+
+        if (!imagemSelecionada || !divisaoSelecionada) {
+            alert("Escolha uma imagem e uma divisão antes de começar.");
+            return;
+        }
+
+        iniciarJogo();
+        estadoDoJogo = "jogando"; // evita reinício acidental
+    }
 });
 
 
-// 2. LISTENER PARA O BOTÃO DO PAINEL DE CONFIGURAÇÕES (Inicia o Jogo)
-const btnIniciar = document.getElementById('iniciar-jogo');
-if (btnIniciar) {
-    // ESTE CÓDIGO PRECISA FICAR FORA DO EVENTO DA TELA INICIAL
-    btnIniciar.addEventListener('click', () => {
-        // A lógica do jogo DEVE estar aqui
-        if (estadoDoJogo === "pronto" || estadoDoJogo === "jogando") {
-            const imagemSelecionada = selectImagem.value;
-            const divisaoSelecionada = selectDivisao.value;
-
-            if (!imagemSelecionada || !divisaoSelecionada) {
-                alert("Escolha uma imagem e uma divisão antes de começar.");
-                return;
-            }
-            
-            iniciarJogo();
-            estadoDoJogo = "jogando";
-        }
-    });
-}
 // O botão "Reiniciar"
 btnReiniciar.addEventListener('click', () => {
     if (!jogoEncerrado) {
@@ -321,21 +272,7 @@ selectImagem.addEventListener('change', function () {
 
 // Adicionando um listener para o botão de iniciar no painel principal
 // (caso ele exista no seu HTML)
-
+const btnIniciar = document.getElementById('iniciar-jogo');
 if (btnIniciar) {
-    btnIniciar.addEventListener('click', () => {
-        // A lógica do jogo DEVE estar aqui
-        if (estadoDoJogo === "pronto" || estadoDoJogo === "jogando") {
-            const imagemSelecionada = selectImagem.value;
-            const divisaoSelecionada = selectDivisao.value;
-
-            if (!imagemSelecionada || !divisaoSelecionada) {
-                alert("Escolha uma imagem e uma divisão antes de começar.");
-                return;
-            }
-
-            iniciarJogo();
-            estadoDoJogo = "jogando";
-        }
-    });
+    btnIniciar.addEventListener('click', iniciarJogo);
 }

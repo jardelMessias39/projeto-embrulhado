@@ -54,6 +54,7 @@ function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
             peca.style.boxSizing = 'border-box';
             peca.dataset.pos = `${l}-${c}`;
             peca.draggable = true;
+            peca.classList.add('peca-jogo'); // Adiciona uma classe para o touchEnd saber o que procurar
 
             if (modoDificil) {
                 const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
@@ -65,6 +66,8 @@ function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
             peca.addEventListener('dragover', dragOver);
             peca.addEventListener('drop', drop);
             peca.addEventListener('dragend', dragEnd);
+            peca.addEventListener('touchstart', touchStart);
+            peca.addEventListener('touchend', touchEnd);
 
             pecas.push(peca);
         }
@@ -228,34 +231,67 @@ function dragEnd(e) {
 }
 
 // ====================================================================
-// 4. Event Listeners
+// 3. Funções de Drag and Drop (Com Suporte a Toque)
 // ====================================================================
 
-// O botão "Iniciar Jogo" na tela inicial
-// Ele esconde a tela inicial e, em seguida, inicia o jogo.
+let pecaToqueInicial = null;
+
+function touchStart(e) {
+    if (jogoEncerrado) return;
+    e.preventDefault(); 
+    pecaToqueInicial = e.currentTarget;
+    pecaToqueInicial.style.opacity = '0.5';
+}
+
+function touchEnd(e) {
+    if (jogoEncerrado || !pecaToqueInicial) return;
+    
+    // Tenta encontrar o elemento na posição onde o toque terminou
+    const toqueFinal = document.elementFromPoint(
+        e.changedTouches[0].clientX,
+        e.changedTouches[0].clientY
+    );
+
+    // O elemento precisa ter a classe 'peca-jogo'
+    if (
+        toqueFinal &&
+        toqueFinal.classList.contains('peca-jogo') && 
+        toqueFinal !== pecaToqueInicial &&
+        saoVizinhos(pecaToqueInicial, toqueFinal)
+    ) {
+        // Lógica de troca das peças
+        const temp = document.createElement('div');
+        quebraCabeca.replaceChild(temp, pecaToqueInicial);
+        quebraCabeca.replaceChild(pecaToqueInicial, toqueFinal);
+        quebraCabeca.replaceChild(toqueFinal, temp);
+
+        if (verificarVitoria()) encerrarJogo();
+    }
+
+    // Limpa o estado
+    pecaToqueInicial.style.opacity = '';
+    pecaToqueInicial = null;
+}
+// ====================================================================
+// 4. Event Listeners (CORRIGIDO E SEPARADO)
+// ====================================================================
+
+// 1. O BOTÃO DA TELA INICIAL (SÓ FAZ A TRANSIÇÃO)
 botaoIniciarJogo.addEventListener('click', () => {
+    // Garante que só faz a transição se estiver no estado "inicio"
     if (estadoDoJogo === "inicio") {
         telaInicial.style.opacity = '0';
         setTimeout(() => {
             telaInicial.style.display = 'none';
-            estadoDoJogo = "pronto"; // agora o botão serve para iniciar o jogo
+            // Agora o estado é 'pronto' para o jogador escolher as opções
+            estadoDoJogo = "pronto"; 
         }, 500);
-    } else if (estadoDoJogo === "pronto") {
-        const imagemSelecionada = selectImagem.value;
-        const divisaoSelecionada = selectDivisao.value;
-
-        if (!imagemSelecionada || !divisaoSelecionada) {
-            alert("Escolha uma imagem e uma divisão antes de começar.");
-            return;
-        }
-
-        iniciarJogo();
-        estadoDoJogo = "jogando"; // evita reinício acidental
     }
+    // Removemos o bloco 'else if' que causava a confusão na lógica
 });
 
 
-// O botão "Reiniciar"
+// 2. O BOTÃO "REINICIAR"
 btnReiniciar.addEventListener('click', () => {
     if (!jogoEncerrado) {
         clearInterval(intervaloCronometro);
@@ -264,6 +300,31 @@ btnReiniciar.addEventListener('click', () => {
     }
     iniciarJogo();
 });
+
+// 3. A SELEÇÃO DE IMAGEM
+selectImagem.addEventListener('change', function () {
+    imgPrincipal.src = './imagem/' + this.value;
+});
+
+// 4. O BOTÃO INICIAR JOGO NO PAINEL PRINCIPAL (Realmente inicia o jogo)
+
+if (btnIniciar) {
+    btnIniciar.addEventListener('click', () => {
+        // A lógica do jogo DEVE estar aqui
+        if (estadoDoJogo === "pronto" || estadoDoJogo === "jogando") {
+            const imagemSelecionada = selectImagem.value;
+            const divisaoSelecionada = selectDivisao.value;
+
+            if (!imagemSelecionada || !divisaoSelecionada) {
+                alert("Escolha uma imagem e uma divisão antes de começar.");
+                return;
+            }
+            
+            iniciarJogo();
+            estadoDoJogo = "jogando";
+        }
+    });
+}
 
 // A seleção de imagem
 selectImagem.addEventListener('change', function () {

@@ -54,6 +54,7 @@ function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
             peca.style.boxSizing = 'border-box';
             peca.dataset.pos = `${l}-${c}`;
             peca.draggable = true;
+            peca.classList.add('peca-jogo');
 
             if (modoDificil) {
                 const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
@@ -220,6 +221,42 @@ function drop(e) {
 
         if (verificarVitoria()) encerrarJogo();
     }
+}
+peca.addEventListener('touchstart', touchStart);
+peca.addEventListener('touchend', touchEnd);
+
+let pecaToqueInicial = null;
+
+function touchStart(e) {
+  if (jogoEncerrado) return;
+  pecaToqueInicial = e.currentTarget;
+  pecaToqueInicial.style.opacity = '0.5';
+}
+
+function touchEnd(e) {
+  if (jogoEncerrado || !pecaToqueInicial) return;
+
+  const toqueFinal = document.elementFromPoint(
+    e.changedTouches[0].clientX,
+    e.changedTouches[0].clientY
+  );
+
+  if (
+    toqueFinal &&
+    toqueFinal.classList.contains('peca-jogo') &&
+    toqueFinal !== pecaToqueInicial &&
+    saoVizinhos(pecaToqueInicial, toqueFinal)
+  ) {
+    const temp = document.createElement('div');
+    quebraCabeca.replaceChild(temp, pecaToqueInicial);
+    quebraCabeca.replaceChild(pecaToqueInicial, toqueFinal);
+    quebraCabeca.replaceChild(toqueFinal, temp);
+
+    if (verificarVitoria()) encerrarJogo();
+  }
+
+  pecaToqueInicial.style.opacity = '';
+  pecaToqueInicial = null;
 }
 
 function dragEnd(e) {

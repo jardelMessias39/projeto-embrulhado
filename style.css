@@ -9,8 +9,40 @@ body {
 }
 
 #tela-inicial {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
   transition: opacity 0.5s ease;
+  touch-action: manipulation;
+  overflow: hidden;
 }
+
+#botao-iniciar-jogo {
+  background-color: #664f8b;
+  border: none;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px #0003;
+  cursor: pointer;
+}
+
+#botao-iniciar-jogo img {
+  width: 80px;
+  height: 80px;
+}
+
+
 /* Container para centralizar tudo */
 .container {
   max-width: 600px;

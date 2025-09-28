@@ -307,22 +307,25 @@ selectImagem.addEventListener('change', function () {
 });
 
 // 4. O BOTÃO INICIAR JOGO NO PAINEL PRINCIPAL (Realmente inicia o jogo)
+const btnIniciar = document.getElementById('iniciar-jogo');
 
 if (btnIniciar) {
     btnIniciar.addEventListener('click', () => {
-        // A lógica do jogo DEVE estar aqui
-        if (estadoDoJogo === "pronto" || estadoDoJogo === "jogando") {
-            const imagemSelecionada = selectImagem.value;
-            const divisaoSelecionada = selectDivisao.value;
+        
+        // Se a tela inicial já sumiu (o que define o estado como "pronto"), podemos prosseguir.
+        
+        const imagemSelecionada = selectImagem.value;
+        const divisaoSelecionada = selectDivisao.value;
 
-            if (!imagemSelecionada || !divisaoSelecionada) {
-                alert("Escolha uma imagem e uma divisão antes de começar.");
-                return;
-            }
-            
-            iniciarJogo();
-            estadoDoJogo = "jogando";
+        // Validação: Verifique se as opções foram escolhidas
+        if (!imagemSelecionada || !divisaoSelecionada) {
+            alert("Escolha uma imagem e uma divisão antes de começar.");
+            return;
         }
+        
+        // Se a validação passou, inicie o jogo e mude o estado
+        iniciarJogo();
+        estadoDoJogo = "jogando";
     });
 }
 
@@ -333,7 +336,7 @@ selectImagem.addEventListener('change', function () {
 
 // Adicionando um listener para o botão de iniciar no painel principal
 // (caso ele exista no seu HTML)
-const btnIniciar = document.getElementById('iniciar-jogo');
+
 if (btnIniciar) {
     btnIniciar.addEventListener('click', iniciarJogo);
 }

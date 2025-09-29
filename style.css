@@ -79,6 +79,53 @@ button:hover {
   border: 1px solid rgba(255, 255, 255, 0.5); /* Borda branca transparente para as peças */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra sutil nas peças */
 }
+/* --- Estilização Adicional para o Jogo --- */
+
+/* Novo container para o cronômetro e os controles de música */
+.painel-status {
+    display: flex;
+    justify-content: space-between; /* Espaço entre o cronômetro e os controles */
+    align-items: center;
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 10px 0;
+}
+
+#cronometro {
+    /* Mantém o estilo original do cronômetro */
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #4f8b66; /* Uma cor de destaque, por exemplo, verde */
+    background-color: #e8f5e9;
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+/* Estilo para o grupo de botões de música */
+.controles-musica button {
+    /* Herda o estilo base do botão, mas com ajustes */
+    padding: 8px 12px;
+    font-size: 1em;
+    margin: 0 5px;
+    width: 40px; /* Largura fixa para os ícones */
+    height: 40px; /* Altura fixa */
+    border-radius: 50%; /* Torna-os redondos */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #8a6fbf; /* Roxo ligeiramente mais claro */
+}
+
+.controles-musica button:hover {
+    background-color: #664f8b; /* Inverte a cor de hover */
+    transform: scale(1.05); /* Um pequeno zoom */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Ajuste para o Modo Difícil --- */
+
+/* Transição de rotação para dar um efeito visual mais suave ao girar a peça */
+.peca-jogo {
+    transition: transform 0.2s ease-out; 
+}
 /* Estilos para o jogo em telas de até 768px (tablets em modo retrato) */
 @media (max-width: 768px) {
   .container {

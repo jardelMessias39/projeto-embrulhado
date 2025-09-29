@@ -1,5 +1,6 @@
-
-
+// ====================================================================
+// 1. Variáveis e Configuração Inicial (ADICIONANDO NOVOS ELEMENTOS)
+// ====================================================================
 const telaInicial = document.getElementById('tela-inicial');
 const botaoIniciarJogo = document.getElementById('botao-iniciar-jogo');
 const btnReiniciar = document.getElementById('reiniciar-jogo');
@@ -10,11 +11,13 @@ const quebraCabeca = document.getElementById('quebra-cabeca');
 const cronometroDisplay = document.getElementById('cronometro');
 const musicaFrequencia = document.getElementById('musica-frequencia');
 const modoDificilCheckbox = document.getElementById('modo-dificil');
+
+// NOVOS ELEMENTOS DE CONTROLE DE MÚSICA
+const btnPauseMusica = document.getElementById('btn-pause-musica');
+const btnMudarMusica = document.getElementById('btn-mudar-musica');
+
 let estadoDoJogo = "inicio";
 
-
-
-// As faixas de áudio são arquivos locais na sua pasta 'musicas'.
 const faixasAudio = [
     './musicas/blue-sky-binaural-meditation-191542.mp3',
     './musicas/gamma-binaural-beats-enhance-brain-power-relaxing-music-for-study-161763.mp3',
@@ -29,10 +32,29 @@ let tempo = 0;
 let intervaloCronometro = null;
 let pecaArrastando = null;
 let jogoEncerrado = false;
+let musicaPausada = false; // Estado do pause da música
 
 // ====================================================================
-// 2. Funções de Lógica e Jogo
+// 2. Funções de Lógica e Jogo (CORRIGIDAS E NOVAS)
 // ====================================================================
+
+/**
+ * Gira uma peça em 90 graus (apenas no modo difícil).
+ */
+function girarPeca() {
+    // Só gira se não estiver encerrado E o modo difícil estiver ativo
+    if (jogoEncerrado || !modoDificilCheckbox.checked) return;
+
+    let anguloAtual = parseInt(this.dataset.angulo || 0);
+    anguloAtual = (anguloAtual + 90) % 360;
+    
+    // CORREÇÃO AQUI: Aplica a rotação
+    this.style.transform = `rotate(${anguloAtual}deg)`;
+    this.dataset.angulo = anguloAtual.toString(); 
+
+    if (verificarVitoria()) encerrarJogo();
+}
+
 
 /**
  * Cria e embaralha as peças do quebra-cabeça.
@@ -54,12 +76,19 @@ function criarPecas(colunas, linhas, imagemSrc, modoDificil) {
             peca.style.boxSizing = 'border-box';
             peca.dataset.pos = `${l}-${c}`;
             peca.draggable = true;
-            peca.classList.add('peca-jogo'); // Adiciona uma classe para o touchEnd saber o que procurar
+            peca.classList.add('peca-jogo'); 
 
             if (modoDificil) {
                 const angulo = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
-                peca.style.transform = `rotate('${angulo}deg')`;
-                peca.dataset.angulo = angulo;
+                // CORREÇÃO NO CSS: Aplicação correta do 'rotate'
+                peca.style.transform = `rotate(${angulo}deg)`;
+                peca.dataset.angulo = angulo; 
+                
+                // ADICIONA o listener de clique/toque para GIRA a peça (Modo Difícil)
+                peca.addEventListener('click', girarPeca); 
+            } else {
+                // Garante que o dataset.angulo exista e seja "0" no modo normal
+                peca.dataset.angulo = "0"; 
             }
 
             peca.addEventListener('dragstart', dragStart);
@@ -94,17 +123,51 @@ function iniciarCronometro() {
     }, 1000);
 }
 
+// =======================
+// NOVAS FUNÇÕES DE MÚSICA
+// =======================
+
 /**
- * Inicia a música de fundo.
+ * Pausa ou retoma a música.
  */
-function iniciarMusica() {
+function toggleMusica() {
+    if (musicaFrequencia.paused) {
+        musicaFrequencia.play();
+        musicaPausada = false;
+        // Atualiza o ícone para pausa
+        btnPauseMusica.textContent = '⏸️'; 
+    } else {
+        musicaFrequencia.pause();
+        musicaPausada = true;
+        // Atualiza o ícone para play
+        btnPauseMusica.textContent = '▶️'; 
+    }
+}
+
+/**
+ * Inicia a próxima música aleatória.
+ */
+function mudarMusica() {
     musicaFrequencia.pause();
     musicaFrequencia.currentTime = 0;
     const faixaAleatoria = faixasAudio[Math.floor(Math.random() * faixasAudio.length)];
     musicaFrequencia.src = faixaAleatoria;
     musicaFrequencia.volume = 0.3;
+    
     musicaFrequencia.play().catch(err => console.warn('Erro ao tocar música:', err));
+    musicaPausada = false;
+    // Garante que o ícone está no estado de 'pausa' após tocar
+    if (btnPauseMusica) btnPauseMusica.textContent = '⏸️'; 
 }
+
+/**
+ * Inicia a música de fundo.
+ */
+function iniciarMusica() {
+    mudarMusica(); // Usa a função de mudar para iniciar uma faixa aleatória
+}
+
+// =======================
 
 /**
  * Função principal para iniciar o jogo.
@@ -113,13 +176,10 @@ function iniciarJogo() {
     const imagemSelecionada = selectImagem.value;
     const divisaoSelecionada = selectDivisao.value;
 
-    // Verifica se a imagem foi escolhida
     if (!imagemSelecionada) {
         alert("Por favor, selecione uma imagem antes de iniciar o jogo.");
         return;
     }
-
-    // Verifica se a divisão foi escolhida
     if (!divisaoSelecionada) {
         alert("Por favor, selecione a divisão da imagem.");
         return;
@@ -153,7 +213,7 @@ function embaralharArray(array) {
 }
 
 /**
- * Verifica se o quebra-cabeça foi completado.
+ * Verifica se o quebra-cabeça foi completado. (CORRIGIDA)
  */
 function verificarVitoria() {
     const pecasAtuais = Array.from(quebraCabeca.children);
@@ -164,7 +224,12 @@ function verificarVitoria() {
         const l = Math.floor(i / colunas);
         const c = i % colunas;
         const posCorreta = `${l}-${c}`;
+        
+        // 1. Verifica a Posição no DOM (Ordem das Peças)
         if (pecasAtuais[i].dataset.pos !== posCorreta) return false;
+        
+        // 2. Verifica a Rotação no Modo Difícil
+        // A vitória só ocorre se a peça estiver na posição E a rotação for 0 graus
         if (modoDificil && pecasAtuais[i].dataset.angulo !== "0") return false;
     }
     return true;
@@ -199,7 +264,7 @@ function saoVizinhos(p1, p2) {
 }
 
 // ====================================================================
-// 3. Funções de Drag and Drop
+// 3. Funções de Drag and Drop (SEM MUDANÇAS)
 // ====================================================================
 
 function dragStart(e) {
@@ -230,10 +295,6 @@ function dragEnd(e) {
     pecaArrastando = null;
 }
 
-// ====================================================================
-// 3. Funções de Drag and Drop (Com Suporte a Toque)
-// ====================================================================
-
 let pecaToqueInicial = null;
 
 function touchStart(e) {
@@ -252,14 +313,12 @@ function touchEnd(e) {
         e.changedTouches[0].clientY
     );
 
-    // O elemento precisa ter a classe 'peca-jogo'
     if (
         toqueFinal &&
         toqueFinal.classList.contains('peca-jogo') && 
         toqueFinal !== pecaToqueInicial &&
         saoVizinhos(pecaToqueInicial, toqueFinal)
     ) {
-        // Lógica de troca das peças
         const temp = document.createElement('div');
         quebraCabeca.replaceChild(temp, pecaToqueInicial);
         quebraCabeca.replaceChild(pecaToqueInicial, toqueFinal);
@@ -272,22 +331,20 @@ function touchEnd(e) {
     pecaToqueInicial.style.opacity = '';
     pecaToqueInicial = null;
 }
+
 // ====================================================================
-// 4. Event Listeners (CORRIGIDO E SEPARADO)
+// 4. Event Listeners (COM NOVOS LISTENERS DE MÚSICA)
 // ====================================================================
 
 // 1. O BOTÃO DA TELA INICIAL (SÓ FAZ A TRANSIÇÃO)
 botaoIniciarJogo.addEventListener('click', () => {
-    // Garante que só faz a transição se estiver no estado "inicio"
     if (estadoDoJogo === "inicio") {
         telaInicial.style.opacity = '0';
         setTimeout(() => {
             telaInicial.style.display = 'none';
-            // Agora o estado é 'pronto' para o jogador escolher as opções
             estadoDoJogo = "pronto"; 
         }, 500);
     }
-    // Removemos o bloco 'else if' que causava a confusão na lógica
 });
 
 
@@ -298,6 +355,7 @@ btnReiniciar.addEventListener('click', () => {
         musicaFrequencia.pause();
         musicaFrequencia.currentTime = 0;
     }
+    // Reinicia o jogo (e a música)
     iniciarJogo();
 });
 
@@ -311,32 +369,27 @@ const btnIniciar = document.getElementById('iniciar-jogo');
 
 if (btnIniciar) {
     btnIniciar.addEventListener('click', () => {
-        
-        // Se a tela inicial já sumiu (o que define o estado como "pronto"), podemos prosseguir.
-        
         const imagemSelecionada = selectImagem.value;
         const divisaoSelecionada = selectDivisao.value;
 
-        // Validação: Verifique se as opções foram escolhidas
         if (!imagemSelecionada || !divisaoSelecionada) {
             alert("Escolha uma imagem e uma divisão antes de começar.");
             return;
         }
         
-        // Se a validação passou, inicie o jogo e mude o estado
         iniciarJogo();
         estadoDoJogo = "jogando";
     });
 }
 
-// A seleção de imagem
-selectImagem.addEventListener('change', function () {
-    imgPrincipal.src = './imagem/' + this.value;
-});
+// ===================================
+// NOVOS LISTENERS PARA CONTROLES MÚSICA
+// ===================================
 
-// Adicionando um listener para o botão de iniciar no painel principal
-// (caso ele exista no seu HTML)
+if (btnPauseMusica) {
+    btnPauseMusica.addEventListener('click', toggleMusica);
+}
 
-if (btnIniciar) {
-    btnIniciar.addEventListener('click', iniciarJogo);
+if (btnMudarMusica) {
+    btnMudarMusica.addEventListener('click', mudarMusica);
 }

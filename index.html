@@ -3,64 +3,74 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="./imagem/assets/Copilot_20250711_024116.ico">
-  <title>shuffle </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="./imagem/assets/Copilot_20250711_024116.ico">
+    <title>Shuffle</title>
 </head>
 
 <body>
-  <h2>Shuffle</h2>
-<div id="tela-inicial" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 999;">
-  <button id="botao-iniciar-jogo" style="background-color: #664f8b; border: none; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #0003; cursor: pointer;">
-    <img src="imagem/assets/Copilot_20250711_024116.ico" alt="Iniciar" style="width: 80px; height: 80px;">
-  </button>
-</div>
-
-
-
-
-
-
-  <div class="caixa-imagem">
-    <!-- ...restante do seu jogo... -->
-    <label for="divisao-imagem">Divisão:</label>
-    <select id="divisao-imagem">
-      <option value="4x2">4 x 2</option>
-      <option value="4x3">4 x 3</option>
-      <option value="4x4">4 x 4</option>
-      <option value="4x5">4 x 5</option>
-
-    </select>
-    <label for="imagem-selecao">Imagem:</label>
-    <select id="imagem-selecao">
-      <option value="Brasil.jpg">Brasil</option>
-      <option value="coelho.jpg">Coelho</option>
-      <option value="indiana.jpg">Indiana</option>
-      <option value="montanha.jpg">Montanha</option>
-      <option value="natureza.jpg">Natureza</option>
-      <option value="praia-do-forte.jpg">Praia do Forte</option>
-      <option value="tropical.jpg">Tropical</option>
-    </select>
-    <label>
-      <input type="checkbox" id="modo-dificil" />
-      Modo Difícil
-    </label>
-
-    <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;"
-      alt="Imagem Principal" />
-    <div class="botoes-jogo">
-      <button id="iniciar-jogo">Iniciar Jogo</button>
-      <button id="reiniciar-jogo">Reiniciar Jogo</button>
+    <h2>Shuffle</h2>
+    
+    <div id="tela-inicial" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 999;">
+        <button id="botao-iniciar-jogo" style="background-color: #664f8b; border: none; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #0003; cursor: pointer;">
+            <img src="imagem/assets/Copilot_20250711_024116.ico" alt="Iniciar" style="width: 80px; height: 80px;">
+        </button>
     </div>
-    <div id="quebra-cabeca"
-      style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin-top: 20px; border: 1px solid #ccc;">
+
+    <div class="container"> 
+        <div class="caixa-imagem">
+            <label for="divisao-imagem">Divisão:</label>
+            <select id="divisao-imagem">
+                <option value="4x2">4 x 2</option>
+                <option value="4x3">4 x 3</option>
+                <option value="4x4">4 x 4</option>
+                <option value="4x5">4 x 5</option>
+            </select>
+            
+            <label for="imagem-selecao">Imagem:</label>
+            <select id="imagem-selecao">
+                <option value="Brasil.jpg">Brasil</option>
+                <option value="coelho.jpg">Coelho</option>
+                <option value="indiana.jpg">Indiana</option>
+                <option value="montanha.jpg">Montanha</option>
+                <option value="natureza.jpg">Natureza</option>
+                <option value="praia-do-forte.jpg">Praia do Forte</option>
+                <option value="tropical.jpg">Tropical</option>
+            </select>
+            
+            <label>
+                <input type="checkbox" id="modo-dificil" />
+                Modo Difícil
+            </label>
+
+            <img id="imagem-principal" src="./imagem/Brasil.jpg" style="max-width: 400px; display: block; margin-top: 10px;" alt="Imagem Principal" />
+            
+            <div class="botoes-jogo">
+                <button id="iniciar-jogo">Iniciar Jogo</button>
+                <button id="reiniciar-jogo">Reiniciar Jogo</button>
+            </div>
+        </div>
+
+        <div class="painel-status">
+            <div id="cronometro">Tempo: 00:00</div>
+            
+            <div class="controles-musica">
+                <button id="btn-pause-musica" title="Pausar/Tocar Música">⏸️</button> 
+                <button id="btn-mudar-musica" title="Próxima Música">⏭️</button>
+            </div>
+        </div>
+
+        <div id="quebra-cabeca"
+            style="display: flex; flex-wrap: wrap; width: 400px; height: 300px; margin: 20px auto 0; border: 1px solid #ccc;">
+            </div>
+        
     </div>
-    <div id="cronometro" style="font-size: 20px; margin-top: 10px;">Tempo: 00:00</div>
-  </div>
-  <audio id="musica-frequencia" loop></audio>
+
+    <audio id="musica-frequencia" loop></audio>
+
+    <script src="script.js" defer></script>
 </body>
-  <script src="script.js" defer></script>
 </html>

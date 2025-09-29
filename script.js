@@ -12,6 +12,7 @@ const cronometroDisplay = document.getElementById('cronometro');
 const musicaFrequencia = document.getElementById('musica-frequencia');
 const modoDificilCheckbox = document.getElementById('modo-dificil');
 
+const TEMPO_DUPLO_TOQUE = 300; // 300 milissegundos
 // NOVOS ELEMENTOS DE CONTROLE DE MÚSICA
 const btnPauseMusica = document.getElementById('btn-pause-musica');
 const btnMudarMusica = document.getElementById('btn-mudar-musica');
@@ -33,6 +34,10 @@ let intervaloCronometro = null;
 let pecaArrastando = null;
 let jogoEncerrado = false;
 let musicaPausada = false; // Estado do pause da música
+let pecaToqueInicial = null;
+let ultimoToque = 0; // Variável para rastrear o tempo do último toque
+
+
 
 // ====================================================================
 // 2. Funções de Lógica e Jogo (CORRIGIDAS E NOVAS)
@@ -295,30 +300,53 @@ function dragEnd(e) {
     pecaArrastando = null;
 }
 
-let pecaToqueInicial = null;
 
 function touchStart(e) {
     if (jogoEncerrado) return;
     e.preventDefault(); 
     pecaToqueInicial = e.currentTarget;
     pecaToqueInicial.style.opacity = '0.5';
+
+    const agora = new Date().getTime();
+    
+    // Lógica de Duplo Toque: Se o tempo entre os toques for menor que 300ms
+    if (agora - ultimoToque < TEMPO_DUPLO_TOQUE) {
+        // É um toque duplo! Gira a peça
+        girarPeca.call(pecaToqueInicial); // Chama a função girarPeca no contexto da peça
+        
+        // Zera o tempo para que 3 toques não girem 2x
+        ultimoToque = 0; 
+        
+        // Evita a lógica de troca para este toque duplo
+        pecaToqueInicial.style.opacity = '';
+        pecaToqueInicial = null;
+        return; 
+    }
+    
+    // Armazena o tempo do toque atual
+    ultimoToque = agora;
 }
 
 function touchEnd(e) {
     if (jogoEncerrado || !pecaToqueInicial) return;
     
+    // Se o toque inicial foi nulo (porque foi um duplo toque e a peça girou), saímos.
+    if (!pecaToqueInicial) return; 
+
     // Tenta encontrar o elemento na posição onde o toque terminou
     const toqueFinal = document.elementFromPoint(
         e.changedTouches[0].clientX,
         e.changedTouches[0].clientY
     );
 
+    // Lógica de troca de peça (a mesma de antes)
     if (
         toqueFinal &&
         toqueFinal.classList.contains('peca-jogo') && 
         toqueFinal !== pecaToqueInicial &&
         saoVizinhos(pecaToqueInicial, toqueFinal)
     ) {
+        // Lógica de troca das peças
         const temp = document.createElement('div');
         quebraCabeca.replaceChild(temp, pecaToqueInicial);
         quebraCabeca.replaceChild(pecaToqueInicial, toqueFinal);
@@ -330,8 +358,9 @@ function touchEnd(e) {
     // Limpa o estado
     pecaToqueInicial.style.opacity = '';
     pecaToqueInicial = null;
-}
 
+   
+}
 // ====================================================================
 // 4. Event Listeners (COM NOVOS LISTENERS DE MÚSICA)
 // ====================================================================
